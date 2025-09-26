@@ -102,8 +102,10 @@ func main() {
 	}()
 
 	// Send startup notification
-	if err := gc.telegramClient.SendStartupMessage(); err != nil {
-		logger.Warnf("Failed to send startup notification: %v", err)
+	if gc.telegramClient != nil {
+		if err := gc.telegramClient.SendStartupMessage(); err != nil {
+			logger.Warnf("Failed to send startup notification: %v", err)
+		}
 	}
 
 	// Start cleanup routine
@@ -220,8 +222,10 @@ func (gc *NamespaceGC) performCleanup() {
 	namespaces, err := gc.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		gc.logger.Errorf("Failed to list namespaces: %v", err)
-		if err := gc.telegramClient.SendError("Failed to list namespaces", err); err != nil {
-			gc.logger.Warnf("Failed to send error notification: %v", err)
+		if gc.telegramClient != nil {
+			if err := gc.telegramClient.SendError("Failed to list namespaces", err); err != nil {
+				gc.logger.Warnf("Failed to send error notification: %v", err)
+			}
 		}
 		return
 	}
@@ -251,8 +255,10 @@ func (gc *NamespaceGC) performCleanup() {
 		// Clean up Helm releases first
 		if err := gc.cleanupHelmReleases(ns.Name); err != nil {
 			gc.logger.Errorf("Failed to cleanup Helm releases in namespace %s: %v", ns.Name, err)
-			if err := gc.telegramClient.SendError(fmt.Sprintf("Failed to cleanup Helm releases in namespace %s", ns.Name), err); err != nil {
-				gc.logger.Warnf("Failed to send error notification: %v", err)
+			if gc.telegramClient != nil {
+				if err := gc.telegramClient.SendError(fmt.Sprintf("Failed to cleanup Helm releases in namespace %s", ns.Name), err); err != nil {
+					gc.logger.Warnf("Failed to send error notification: %v", err)
+				}
 			}
 			continue
 		}
@@ -260,16 +266,20 @@ func (gc *NamespaceGC) performCleanup() {
 		// Delete namespace
 		if err := gc.deleteNamespace(ns.Name); err != nil {
 			gc.logger.Errorf("Failed to delete namespace %s: %v", ns.Name, err)
-			if err := gc.telegramClient.SendError(fmt.Sprintf("Failed to delete namespace %s", ns.Name), err); err != nil {
-				gc.logger.Warnf("Failed to send error notification: %v", err)
+			if gc.telegramClient != nil {
+				if err := gc.telegramClient.SendError(fmt.Sprintf("Failed to delete namespace %s", ns.Name), err); err != nil {
+					gc.logger.Warnf("Failed to send error notification: %v", err)
+				}
 			}
 			continue
 		}
 
 		// Send notification about deleted namespace
 		namespaceAge := time.Since(ns.CreationTimestamp.Time)
-		if err := gc.telegramClient.SendNamespaceDeleted(ns.Name, namespaceAge); err != nil {
-			gc.logger.Warnf("Failed to send namespace deletion notification: %v", err)
+		if gc.telegramClient != nil {
+			if err := gc.telegramClient.SendNamespaceDeleted(ns.Name, namespaceAge); err != nil {
+				gc.logger.Warnf("Failed to send namespace deletion notification: %v", err)
+			}
 		}
 
 		cleanedCount++
@@ -280,8 +290,10 @@ func (gc *NamespaceGC) performCleanup() {
 	gc.logger.Infof("Cleanup completed. Cleaned %d namespaces", cleanedCount)
 
 	// Send cleanup summary
-	if err := gc.telegramClient.SendCleanupSummary(len(namespaces.Items), cleanedCount, duration); err != nil {
-		gc.logger.Warnf("Failed to send cleanup summary: %v", err)
+	if gc.telegramClient != nil {
+		if err := gc.telegramClient.SendCleanupSummary(len(namespaces.Items), cleanedCount, duration); err != nil {
+			gc.logger.Warnf("Failed to send cleanup summary: %v", err)
+		}
 	}
 }
 
@@ -321,8 +333,10 @@ func (gc *NamespaceGC) cleanupHelmReleases(namespace string) error {
 			gc.logger.Infof("Successfully uninstalled Helm release: %s", release.Name)
 
 			// Send notification about deleted Helm release
-			if err := gc.telegramClient.SendHelmReleaseDeleted(release.Name, namespace); err != nil {
-				gc.logger.Warnf("Failed to send Helm release deletion notification: %v", err)
+			if gc.telegramClient != nil {
+				if err := gc.telegramClient.SendHelmReleaseDeleted(release.Name, namespace); err != nil {
+					gc.logger.Warnf("Failed to send Helm release deletion notification: %v", err)
+				}
 			}
 		}
 	}

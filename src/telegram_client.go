@@ -49,6 +49,11 @@ func NewTelegramClient(config *TelegramConfig, logger *logrus.Logger) *TelegramC
 }
 
 func (tc *TelegramClient) SendMessage(text string) error {
+	if tc.config == nil {
+		tc.logger.Warn("Telegram config is nil")
+		return nil
+	}
+
 	if !tc.config.Enabled {
 		tc.logger.Debug("Telegram notifications are disabled")
 		return nil
@@ -94,7 +99,7 @@ func (tc *TelegramClient) SendMessage(text string) error {
 }
 
 func (tc *TelegramClient) SendNamespaceDeleted(namespace string, age time.Duration) error {
-	if !tc.config.Notifications.NamespaceDeleted {
+	if tc.config == nil || !tc.config.Notifications.NamespaceDeleted {
 		tc.logger.Debug("Namespace deletion notifications are disabled")
 		return nil
 	}
@@ -111,7 +116,7 @@ func (tc *TelegramClient) SendNamespaceDeleted(namespace string, age time.Durati
 }
 
 func (tc *TelegramClient) SendHelmReleaseDeleted(releaseName, namespace string) error {
-	if !tc.config.Notifications.HelmReleaseDeleted {
+	if tc.config == nil || !tc.config.Notifications.HelmReleaseDeleted {
 		tc.logger.Debug("Helm release deletion notifications are disabled")
 		return nil
 	}
@@ -128,7 +133,7 @@ func (tc *TelegramClient) SendHelmReleaseDeleted(releaseName, namespace string) 
 }
 
 func (tc *TelegramClient) SendCleanupSummary(totalNamespaces, cleanedNamespaces int, duration time.Duration) error {
-	if !tc.config.Notifications.CleanupSummary {
+	if tc.config == nil || !tc.config.Notifications.CleanupSummary {
 		tc.logger.Debug("Cleanup summary notifications are disabled")
 		return nil
 	}
@@ -147,7 +152,7 @@ func (tc *TelegramClient) SendCleanupSummary(totalNamespaces, cleanedNamespaces 
 }
 
 func (tc *TelegramClient) SendError(message string, err error) error {
-	if !tc.config.Notifications.Errors {
+	if tc.config == nil || !tc.config.Notifications.Errors {
 		tc.logger.Debug("Error notifications are disabled")
 		return nil
 	}
@@ -164,7 +169,7 @@ func (tc *TelegramClient) SendError(message string, err error) error {
 }
 
 func (tc *TelegramClient) SendStartupMessage() error {
-	if !tc.config.Notifications.Startup {
+	if tc.config == nil || !tc.config.Notifications.Startup {
 		tc.logger.Debug("Startup notifications are disabled")
 		return nil
 	}

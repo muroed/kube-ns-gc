@@ -50,7 +50,12 @@ func NewHelmClient() (*HelmClient, error) {
 	}
 
 	// Initialize action configuration
-	if err := actionConfig.Init(cli.New().RESTClientGetter(), "", "secrets", func(format string, v ...interface{}) {
+	cliEnv := cli.New()
+	if cliEnv == nil {
+		return nil, fmt.Errorf("failed to create CLI environment")
+	}
+	
+	if err := actionConfig.Init(cliEnv.RESTClientGetter(), "", "secrets", func(format string, v ...interface{}) {
 		logger.Debugf(format, v...)
 	}); err != nil {
 		return nil, fmt.Errorf("failed to initialize Helm action config: %v", err)
@@ -63,8 +68,16 @@ func NewHelmClient() (*HelmClient, error) {
 }
 
 func (hc *HelmClient) ListReleases(namespace string) ([]HelmRelease, error) {
+	if hc.actionConfig == nil {
+		return nil, fmt.Errorf("Helm action config is nil")
+	}
+
 	// Create list action
 	listAction := action.NewList(hc.actionConfig)
+	if listAction == nil {
+		return nil, fmt.Errorf("failed to create list action")
+	}
+	
 	listAction.AllNamespaces = false
 	listAction.StateMask = action.ListAll
 
@@ -91,8 +104,16 @@ func (hc *HelmClient) ListReleases(namespace string) ([]HelmRelease, error) {
 }
 
 func (hc *HelmClient) UninstallRelease(releaseName, namespace string, timeout time.Duration) error {
+	if hc.actionConfig == nil {
+		return fmt.Errorf("Helm action config is nil")
+	}
+
 	// Create uninstall action
 	uninstallAction := action.NewUninstall(hc.actionConfig)
+	if uninstallAction == nil {
+		return fmt.Errorf("failed to create uninstall action")
+	}
+	
 	uninstallAction.Timeout = timeout
 	uninstallAction.Wait = true
 
@@ -107,8 +128,15 @@ func (hc *HelmClient) UninstallRelease(releaseName, namespace string, timeout ti
 }
 
 func (hc *HelmClient) GetReleaseStatus(releaseName, namespace string) (*release.Release, error) {
+	if hc.actionConfig == nil {
+		return nil, fmt.Errorf("Helm action config is nil")
+	}
+
 	// Create get action
 	getAction := action.NewGet(hc.actionConfig)
+	if getAction == nil {
+		return nil, fmt.Errorf("failed to create get action")
+	}
 
 	// Get release
 	release, err := getAction.Run(releaseName)

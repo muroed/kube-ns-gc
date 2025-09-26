@@ -1,0 +1,28 @@
+# Пример неймспейса, который будет удален через 7 дней
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-namespace
+  labels:
+    # Этот неймспейс будет удален, так как нет лейбла kube-ns-gc.ignore
+    environment: development
+    team: backend
+---
+# Пример неймспейса, который НЕ будет удален (есть лейбл игнорирования)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: important-namespace
+  labels:
+    kube-ns-gc.ignore: "true"  # Этот лейбл защищает от удаления
+    environment: production
+    team: platform
+---
+# Пример неймспейса с Helm релизом
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-with-helm
+  labels:
+    environment: staging
+    team: frontend

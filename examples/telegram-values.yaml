@@ -1,0 +1,64 @@
+# Пример конфигурации с включенными Telegram уведомлениями
+
+# Основные настройки
+config:
+  # Периодичность очистки
+  cleanupInterval: "24h"
+  
+  # Максимальный возраст неймспейсов
+  namespaceMaxAge: "168h"  # 7 дней
+  
+  # Таймаут удаления Helm релизов
+  helmReleaseTimeout: "5m"
+  
+  # Исключенные неймспейсы
+  excludedNamespaces:
+    - kube-system
+    - kube-public
+    - kube-node-lease
+    - default
+    - kube-ns-gc
+    - production
+    - staging
+    - monitoring
+    - logging
+  
+  # Лейбл для игнорирования
+  ignoreLabel: "kube-ns-gc.ignore"
+  
+  # Уровень логирования
+  logLevel: "info"
+  
+  # Порт HTTP сервера
+  port: 8080
+  
+  # Настройки Telegram уведомлений
+  telegram:
+    enabled: true
+    botToken: "1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"  # Замените на ваш токен
+    chatId: "123456789"  # Замените на ваш Chat ID
+    parseMode: "Markdown"
+    notifications:
+      startup: true
+      namespaceDeleted: true
+      helmReleaseDeleted: true
+      cleanupSummary: true
+      errors: true
+
+# Ресурсы
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Реплики
+replicaCount: 1
+
+# Образ
+image:
+  repository: kube-ns-gc
+  tag: "latest"
+  pullPolicy: IfNotPresent

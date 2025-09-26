@@ -1,0 +1,30 @@
+{
+  "cleanup_interval": "24h",
+  "namespace_max_age": "168h",
+  "helm_release_timeout": "5m",
+  "excluded_namespaces": [
+    "kube-system",
+    "kube-public", 
+    "kube-node-lease",
+    "default",
+    "kube-ns-gc",
+    "production",
+    "staging"
+  ],
+  "ignore_label": "kube-ns-gc.ignore",
+  "log_level": "info",
+  "port": 8080,
+  "telegram": {
+    "enabled": true,
+    "bot_token": "YOUR_BOT_TOKEN_HERE",
+    "chat_id": "YOUR_CHAT_ID_HERE",
+    "parse_mode": "Markdown",
+    "notifications": {
+      "startup": true,
+      "namespace_deleted": true,
+      "helm_release_deleted": true,
+      "cleanup_summary": true,
+      "errors": true
+    }
+  }
+}

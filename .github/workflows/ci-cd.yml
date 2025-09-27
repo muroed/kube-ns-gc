@@ -114,6 +114,17 @@ jobs:
 
     - name: Package Helm chart
       run: |
+        # Create packages directory if it doesn't exist
+        mkdir -p ./packages
+        
+        # Verify chart directory exists
+        if [ ! -d "deploy/kube-ns-gc" ]; then
+          echo "Error: deploy/kube-ns-gc directory not found"
+          ls -la deploy/
+          exit 1
+        fi
+        
+        # Package the chart
         helm package deploy/kube-ns-gc --destination ./packages
 
     - name: Generate chart index

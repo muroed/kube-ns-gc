@@ -120,7 +120,7 @@ jobs:
         # Verify chart directory exists
         if [ ! -d "deploy/kube-ns-gc" ]; then
           echo "Error: deploy/kube-ns-gc directory not found"
-          ls -la deploy/
+          ls -la ./
           exit 1
         fi
         

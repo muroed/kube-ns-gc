@@ -73,6 +73,24 @@ if listAction == nil {
 - `UninstallRelease()` - проверка actionConfig и uninstallAction
 - `GetReleaseStatus()` - проверка actionConfig и getAction
 
+### ✅ 4. telegram_client_test.go - Исправление тестов
+Добавлен early return в тесте для предотвращения nil pointer dereference:
+
+```go
+// Было:
+if client == nil {
+    t.Error("Expected client to be created, got nil")
+}
+if client.config != config { // potential nil pointer dereference
+
+// Стало:
+if client == nil {
+    t.Error("Expected client to be created, got nil")
+    return // Exit early to avoid nil pointer dereference
+}
+if client.config != config {
+```
+
 ## Результат
 
 ### ✅ Проверки пройдены:
@@ -82,11 +100,15 @@ go test -v ./src/...
 
 # Сборка работает
 go build -o kube-ns-gc ./src
+
+# golangci-lint проходит без ошибок
+golangci-lint run --out-format=colored-line-number ./src/...
 ```
 
 ### ✅ Исправлены ошибки:
 - SA5011: possible nil pointer dereference (staticcheck)
 - Все nil pointer dereference устранены
+- Тесты исправлены для предотвращения nil pointer dereference
 - Код стал более безопасным и устойчивым
 
 ## Безопасность

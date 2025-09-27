@@ -60,6 +60,7 @@ func TestNewTelegramClient(t *testing.T) {
 
 	if client == nil {
 		t.Error("Expected client to be created, got nil")
+		return // Exit early if client is nil to avoid nil pointer dereference
 	}
 
 	if client.config != config {

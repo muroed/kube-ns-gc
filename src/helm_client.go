@@ -54,7 +54,7 @@ func NewHelmClient() (*HelmClient, error) {
 	if cliEnv == nil {
 		return nil, fmt.Errorf("failed to create CLI environment")
 	}
-	
+
 	if err := actionConfig.Init(cliEnv.RESTClientGetter(), "", "secrets", func(format string, v ...interface{}) {
 		logger.Debugf(format, v...)
 	}); err != nil {
@@ -77,7 +77,7 @@ func (hc *HelmClient) ListReleases(namespace string) ([]HelmRelease, error) {
 	if listAction == nil {
 		return nil, fmt.Errorf("failed to create list action")
 	}
-	
+
 	listAction.AllNamespaces = false
 	listAction.StateMask = action.ListAll
 
@@ -113,7 +113,7 @@ func (hc *HelmClient) UninstallRelease(releaseName, namespace string, timeout ti
 	if uninstallAction == nil {
 		return fmt.Errorf("failed to create uninstall action")
 	}
-	
+
 	uninstallAction.Timeout = timeout
 	uninstallAction.Wait = true
 

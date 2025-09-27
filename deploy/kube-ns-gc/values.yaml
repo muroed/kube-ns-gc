@@ -2,9 +2,9 @@
 replicaCount: 1
 
 image:
-  repository: kube-ns-gc
+  repository: ghcr.io/muroed/kube-ns-gc
   pullPolicy: IfNotPresent
-  tag: "latest"
+  # tag: "" # If empty, will use Chart.AppVersion (same as Chart.Version)
 
 imagePullSecrets: []
 nameOverride: ""

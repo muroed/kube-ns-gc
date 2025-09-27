@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Extract version from tag
+      id: version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Extracted version: $VERSION"
+
+    - name: Update Chart.yaml version
+      run: |
+        sed -i "s/^version: .*/version: ${{ steps.version.outputs.version }}/" deploy/kube-ns-gc/Chart.yaml
+        sed -i "s/^appVersion: .*/appVersion: \"${{ steps.version.outputs.version }}\"/" deploy/kube-ns-gc/Chart.yaml
+        echo "Updated Chart.yaml:"
+        cat deploy/kube-ns-gc/Chart.yaml
+
+    - name: Commit version update
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add deploy/kube-ns-gc/Chart.yaml
+        git commit -m "Update chart version to ${{ steps.version.outputs.version }}" || exit 0
+        git push origin main
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          ghcr.io/muroed/kube-ns-gc:${{ steps.version.outputs.version }}
+          ghcr.io/muroed/kube-ns-gc:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Package Helm chart
+      run: |
+        helm package deploy/kube-ns-gc --destination ./packages
+
+    - name: Generate chart index
+      run: |
+        helm repo index ./packages --url https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./packages/*
+        generate_release_notes: true
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,116 @@
+ # Default values for kube-ns-gc
+replicaCount: 1
+
+image:
+  repository: kube-ns-gc
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1001
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1001
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: kube-ns-gc.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Configuration
+config:
+  # Cleanup interval (how often to run cleanup)
+  cleanupInterval: "24h"
+  
+  # Maximum age of namespaces before deletion
+  namespaceMaxAge: "168h"  # 7 days
+  
+  # Timeout for Helm release uninstallation
+  helmReleaseTimeout: "5m"
+  
+  # Namespaces to exclude from deletion
+  excludedNamespaces:
+    - kube-system
+    - kube-public
+    - kube-node-lease
+    - default
+    - kube-ns-gc
+  
+  # Label to ignore namespaces (if this label exists, namespace won't be deleted)
+  ignoreLabel: "kube-ns-gc.ignore"
+  
+  # Log level
+  logLevel: "info"
+  
+  # HTTP server port
+  port: 8080
+  
+  # Telegram notifications
+  telegram:
+    enabled: false
+    botToken: ""
+    chatId: ""
+    parseMode: "Markdown"
+    notifications:
+      startup: true
+      namespaceDeleted: true
+      helmReleaseDeleted: true
+      cleanupSummary: true
+      errors: true
+
+# RBAC configuration
+rbac:
+  create: true
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  maxUnavailable: 1

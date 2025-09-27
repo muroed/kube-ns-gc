@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kube-ns-gc.fullname" . }}-config
+  labels:
+    {{- include "kube-ns-gc.labels" . | nindent 4 }}
+data:
+  config.json: |
+    {
+      "cleanup_interval": "{{ .Values.config.cleanupInterval }}",
+      "namespace_max_age": "{{ .Values.config.namespaceMaxAge }}",
+      "helm_release_timeout": "{{ .Values.config.helmReleaseTimeout }}",
+      "excluded_namespaces": {{ .Values.config.excludedNamespaces | toJson }},
+      "ignore_label": "{{ .Values.config.ignoreLabel }}",
+      "log_level": "{{ .Values.config.logLevel }}",
+      "port": {{ .Values.config.port }},
+      "telegram": {
+        "enabled": {{ .Values.config.telegram.enabled }},
+        "bot_token": "{{ .Values.config.telegram.botToken }}",
+        "chat_id": "{{ .Values.config.telegram.chatId }}",
+        "parse_mode": "{{ .Values.config.telegram.parseMode }}",
+        "notifications": {
+          "startup": {{ .Values.config.telegram.notifications.startup }},
+          "namespace_deleted": {{ .Values.config.telegram.notifications.namespaceDeleted }},
+          "helm_release_deleted": {{ .Values.config.telegram.notifications.helmReleaseDeleted }},
+          "cleanup_summary": {{ .Values.config.telegram.notifications.cleanupSummary }},
+          "errors": {{ .Values.config.telegram.notifications.errors }}
+        }
+      }
+    }

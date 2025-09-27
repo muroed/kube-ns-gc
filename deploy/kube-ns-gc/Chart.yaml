@@ -1,0 +1,17 @@
+apiVersion: v2
+name: kube-ns-gc
+description: Kubernetes Namespace Garbage Collector
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - kubernetes
+  - namespace
+  - garbage-collector
+  - helm
+home: https://github.com/your-org/kube-ns-gc
+sources:
+  - https://github.com/your-org/kube-ns-gc
+maintainers:
+  - name: Your Name
+    email: your.email@example.com

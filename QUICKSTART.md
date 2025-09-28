@@ -13,6 +13,28 @@ cd kube-ns-gc
 ```
 
 ### 2. Установить
+
+#### Вариант A: Через Helm репозиторий (рекомендуется)
+```bash
+# Добавить репозиторий
+helm repo add kube-ns-gc https://muroed.github.io/kube-ns-gc
+helm repo update
+
+# Установить
+helm install kube-ns-gc kube-ns-gc/kube-ns-gc \
+  --namespace kube-ns-gc \
+  --create-namespace
+```
+
+#### Вариант B: Через GitHub Releases
+```bash
+# Скачать последний релиз
+helm install kube-ns-gc https://github.com/muroed/kube-ns-gc/releases/latest/download/kube-ns-gc-0.1.0.tgz \
+  --namespace kube-ns-gc \
+  --create-namespace
+```
+
+#### Вариант C: Локальная установка
 ```bash
 # Простая установка
 ./examples/install.sh

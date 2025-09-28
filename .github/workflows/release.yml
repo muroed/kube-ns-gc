@@ -70,3 +70,5 @@ jobs:
         name: Release ${{ github.ref_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Helm repository update is handled by pages.yml workflow

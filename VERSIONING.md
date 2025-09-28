@@ -89,22 +89,33 @@ ghcr.io/muroed/kube-ns-gc:latest          # Latest тег (только для m
 
 ## Использование
 
-### Установка конкретной версии
+### Установка из Helm репозитория (рекомендуется)
 
 ```bash
-helm install kube-ns-gc ghcr.io/muroed/kube-ns-gc/kube-ns-gc-0.1.0.tgz
+# Добавить репозиторий
+helm repo add kube-ns-gc https://muroed.github.io/kube-ns-gc
+helm repo update
+
+# Установить последнюю версию
+helm install kube-ns-gc kube-ns-gc/kube-ns-gc
+
+# Установить конкретную версию
+helm install kube-ns-gc kube-ns-gc/kube-ns-gc --version 0.1.0
 ```
 
-### Установка из репозитория
+### Установка из GitHub Releases
 
 ```bash
-helm repo add kube-ns-gc https://muroed.github.io/kube-ns-gc
-helm install kube-ns-gc kube-ns-gc/kube-ns-gc --version 0.1.0
+helm install kube-ns-gc https://github.com/muroed/kube-ns-gc/releases/download/v0.1.0/kube-ns-gc-0.1.0.tgz
 ```
 
 ### Обновление
 
 ```bash
+# Обновить до последней версии
+helm upgrade kube-ns-gc kube-ns-gc/kube-ns-gc
+
+# Обновить до конкретной версии
 helm upgrade kube-ns-gc kube-ns-gc/kube-ns-gc --version 0.2.0
 ```
 

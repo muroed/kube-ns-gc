@@ -138,23 +138,7 @@ jobs:
 
     # Release creation is handled by release.yml workflow for git tags
 
-    - name: Update chart repository
-      if: github.ref == 'refs/heads/main'
-      run: |
-        # Clone the gh-pages branch
-        git clone --branch gh-pages https://github.com/${{ github.repository }}.git gh-pages
-        
-        # Copy new packages
-        cp -r ./packages/* gh-pages/
-        
-        # Update index
-        cd gh-pages
-        helm repo index . --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-        
-        # Commit and push
-        git add .
-        git commit -m "Update Helm chart repository"
-        git push origin gh-pages
+    # Helm repository update is handled by pages.yml workflow
 
   security-scan:
     needs: build-and-push

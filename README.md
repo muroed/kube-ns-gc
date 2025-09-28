@@ -37,19 +37,33 @@
 
 ## Установка
 
-### Через Helm
+### Через Helm репозиторий (рекомендуется)
 
 ```bash
 # Добавить репозиторий
-helm repo add kube-ns-gc https://your-org.github.io/kube-ns-gc
+helm repo add kube-ns-gc https://muroed.github.io/kube-ns-gc
 helm repo update
 
-# Установить
+# Установить последнюю версию
 helm install kube-ns-gc kube-ns-gc/kube-ns-gc \
   --namespace kube-ns-gc \
   --create-namespace \
   --set config.namespaceMaxAge=72h \
   --set config.excludedNamespaces[0]=production
+
+# Установить конкретную версию
+helm install kube-ns-gc kube-ns-gc/kube-ns-gc \
+  --version 0.1.0 \
+  --namespace kube-ns-gc \
+  --create-namespace
+```
+
+### Через GitHub Releases
+
+```bash
+# Скачать чарт из релиза
+helm install kube-ns-gc https://github.com/muroed/kube-ns-gc/releases/download/v0.1.0/kube-ns-gc-0.1.0.tgz \
+  --namespace kube-ns-gc --create-namespace
 ```
 
 ### Через kubectl

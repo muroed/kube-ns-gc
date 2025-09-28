@@ -38,8 +38,17 @@ fi
 
 # Update Chart.yaml version
 echo "📝 Updating Chart.yaml version to $VERSION"
-sed -i "s/^version: .*/version: $VERSION/" deploy/kube-ns-gc/Chart.yaml
-sed -i "s/^appVersion: .*/appVersion: \"$VERSION\"/" deploy/kube-ns-gc/Chart.yaml
+
+# Detect OS and use appropriate sed command
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' "s/^version: .*/version: $VERSION/" deploy/kube-ns-gc/Chart.yaml
+    sed -i '' "s/^appVersion: .*/appVersion: \"$VERSION\"/" deploy/kube-ns-gc/Chart.yaml
+else
+    # Linux and other systems
+    sed -i "s/^version: .*/version: $VERSION/" deploy/kube-ns-gc/Chart.yaml
+    sed -i "s/^appVersion: .*/appVersion: \"$VERSION\"/" deploy/kube-ns-gc/Chart.yaml
+fi
 
 # Commit version update
 echo "💾 Committing version update"

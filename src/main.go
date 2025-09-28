@@ -219,7 +219,9 @@ func (gc *NamespaceGC) performCleanup() {
 	gc.logger.Info("Starting namespace cleanup")
 
 	// Get all namespaces
-	namespaces, err := gc.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	namespaces, err := gc.clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		gc.logger.Errorf("Failed to list namespaces: %v", err)
 		if gc.telegramClient != nil {
@@ -348,7 +350,9 @@ func (gc *NamespaceGC) deleteNamespace(name string) error {
 	gc.logger.Debugf("Deleting namespace: %s", name)
 
 	// Delete namespace
-	err := gc.clientset.CoreV1().Namespaces().Delete(context.TODO(), name, metav1.DeleteOptions{})
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	err := gc.clientset.CoreV1().Namespaces().Delete(ctx, name, metav1.DeleteOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete namespace: %v", err)
 	}
@@ -363,7 +367,9 @@ func (gc *NamespaceGC) deleteNamespace(name string) error {
 		case <-timeout:
 			return fmt.Errorf("timeout waiting for namespace deletion")
 		case <-ticker.C:
-			_, err := gc.clientset.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			_, err := gc.clientset.CoreV1().Namespaces().Get(ctx, name, metav1.GetOptions{})
+			cancel()
 			if err != nil {
 				// Namespace is deleted
 				return nil
@@ -374,7 +380,9 @@ func (gc *NamespaceGC) deleteNamespace(name string) error {
 
 func (gc *NamespaceGC) getMetrics(c *gin.Context) {
 	// Simple metrics endpoint
-	namespaces, err := gc.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	namespaces, err := gc.clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to get metrics"})
 		return
